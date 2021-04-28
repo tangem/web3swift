@@ -106,7 +106,7 @@ public struct EthereumAddress: Equatable {
         return ret
     }
     
-    public init?(_ addressString: String, type: AddressType = .normal, ignoreChecksum: Bool = false, network: Networks) {
+    public init?(_ addressString: String, type: AddressType = .normal, ignoreChecksum: Bool = false, network: Networks = .Mainnet) {
         self.network = network
         switch type {
         case .normal:
