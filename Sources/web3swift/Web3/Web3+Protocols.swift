@@ -31,11 +31,12 @@ public protocol EventParserProtocol {
 }
 
 /// Enum for the most-used Ethereum networks. Network ID is crucial for EIP155 support
-public enum Networks {
+public enum Networks: Hashable {
     case Rinkeby
     case Mainnet
     case Ropsten
     case Kovan
+    case RSK
     case Custom(networkID: BigUInt)
     
     public var name: String {
@@ -44,6 +45,7 @@ public enum Networks {
         case .Ropsten: return "ropsten"
         case .Mainnet: return "mainnet"
         case .Kovan: return "kovan"
+        case .RSK: return "rsk"
         case .Custom: return ""
         }
     }
@@ -54,9 +56,12 @@ public enum Networks {
         case .Mainnet: return BigUInt(1)
         case .Ropsten: return BigUInt(3)
         case .Rinkeby: return BigUInt(4)
+        case .RSK: return BigUInt(30)
         case .Kovan: return BigUInt(42)
         }
     }
+    
+    public var hashValue: Int { Int(chainID) }
     
     static let allValues = [Mainnet, Ropsten, Kovan, Rinkeby]
     
@@ -68,6 +73,8 @@ public enum Networks {
             return Networks.Ropsten
         case 4:
             return Networks.Rinkeby
+        case 30:
+            return .RSK
         case 42:
             return Networks.Kovan
         default:
