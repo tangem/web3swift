@@ -153,7 +153,7 @@ public class WebsocketProvider: Web3Provider, IWebsocketProvider, WebSocketDeleg
         url = URL(string: endpointString)!
         delegate = wsdelegate
         attachedKeystoreManager = manager
-        socket = WebSocket(url: url)
+        socket = WebSocket(request: URLRequest(url: url))
         socket.delegate = self
     }
     
@@ -194,7 +194,7 @@ public class WebsocketProvider: Web3Provider, IWebsocketProvider, WebSocketDeleg
         url = URL(string: finalEndpoint)!
         delegate = wsdelegate
         attachedKeystoreManager = manager
-        socket = WebSocket(url: url)
+        socket = WebSocket(request: URLRequest(url: url))
         socket.delegate = self
     }
     
@@ -274,27 +274,39 @@ public class WebsocketProvider: Web3Provider, IWebsocketProvider, WebSocketDeleg
         }
     }
     
+    public func didReceive(event: WebSocketEvent, client: WebSocket) {
+        switch event {
+        case .connected(let dictionary):
+            print("websocket is connected")
+            websocketConnected = true
+        case .disconnected(let string, let uInt16):
+            print("websocket is disconnected with \(string), \(uInt16)")
+            websocketConnected = false
+        case .text(let string):
+            print("got some text: \(string)")
+            websocketDidReceiveMessage(socket: client, text: string)
+        case .binary(let data):
+            print("got some data: \(data.count)")
+            delegate.received(message: data)
+        case .pong(let optional):
+            print("received pong: \(optional)")
+        case .ping(let optional):
+            print("received ping: \(optional)")
+        case .error(let optional):
+            websocketConnected = false
+            print("received error: \(optional)")
+        case .viabilityChanged(let bool):
+            print("received viabilityChanged: \(bool)")
+        case .reconnectSuggested(let bool):
+            print("received reconnectSuggested: \(bool)")
+        case .cancelled:
+            websocketConnected = false
+            print("received cancelled")
+        }
+    }
+    
     public func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
-        print("got some text: \(text)")
-        delegate.received(message: text)
-    }
-    
-    public func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
-        print("got some data: \(data.count)")
-        delegate.received(message: data)
-    }
-    
-    public func websocketDidConnect(socket: WebSocketClient) {
-        print("websocket is connected")
-        websocketConnected = true
-    }
-    
-    public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
-        print("websocket is disconnected with \(error?.localizedDescription ?? "no error")")
-        websocketConnected = false
-    }
-    
-    public func websocketDidReceivePong(socket: WebSocketClient, data: Data?) {
-        print("Got pong! Maybe some data: \(String(describing: data?.count))")
+         print("got some text: \(text)")
+         delegate.received(message: text)
     }
 }
