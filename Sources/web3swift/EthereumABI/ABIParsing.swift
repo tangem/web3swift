@@ -75,14 +75,14 @@ fileprivate func parseFunction(abiRecord:ABI.Record) throws -> ABI.Element.Funct
     let abiOutputs = outputs != nil ? outputs! : [ABI.Element.InOut]()
     let name = abiRecord.name != nil ? abiRecord.name! : ""
     let payable = abiRecord.stateMutability != nil ?
-        (abiRecord.stateMutability == "payable" || abiRecord.payable!) : false
+        (abiRecord.stateMutability == "payable" || (abiRecord.payable ?? false)) : false
     let constant = (abiRecord.constant == true || abiRecord.stateMutability == "view" || abiRecord.stateMutability == "pure")
     let functionElement = ABI.Element.Function(name: name, inputs: abiInputs, outputs: abiOutputs, constant: constant, payable: payable)
     return functionElement
 }
 
 fileprivate func parseFallback(abiRecord:ABI.Record) throws -> ABI.Element.Fallback {
-    let payable = (abiRecord.stateMutability == "payable" || abiRecord.payable!)
+    let payable = (abiRecord.stateMutability == "payable" || (abiRecord.payable ?? false))
     var constant = abiRecord.constant == true
     if (abiRecord.stateMutability == "view" || abiRecord.stateMutability == "pure") {
         constant = true
