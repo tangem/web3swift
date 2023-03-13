@@ -8,7 +8,7 @@ import Foundation
 
 struct Base58 {
     static let base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-
+    
     // Encode
     static func base58FromBytes(_ bytes: [UInt8]) -> String {
         var bytes = bytes
@@ -114,12 +114,12 @@ struct Base58 {
 }
 
 extension Array where Element == UInt8 {
-    public var base58EncodedString: String {
+    var base58EncodedString: String {
         guard !self.isEmpty else { return "" }
         return Base58.base58FromBytes(self)
     }
 
-    public var base58CheckEncodedString: String {
+    var base58CheckEncodedString: String {
         var bytes = self
         let checksum = [UInt8](bytes.sha256().sha256()[0..<4])
 
@@ -130,21 +130,21 @@ extension Array where Element == UInt8 {
 }
 
 extension String {
-    public var base58EncodedString: String {
+    var base58EncodedString: String {
         return [UInt8](utf8).base58EncodedString
     }
 
-    public var base58DecodedData: Data? {
+    var base58DecodedData: Data? {
         let bytes = Base58.bytesFromBase58(self)
         return Data(bytes)
     }
 
-    public var base58CheckDecodedData: Data? {
+    var base58CheckDecodedData: Data? {
         guard let bytes = self.base58CheckDecodedBytes else { return nil }
         return Data(bytes)
     }
 
-    public var base58CheckDecodedBytes: [UInt8]? {
+    var base58CheckDecodedBytes: [UInt8]? {
         var bytes = Base58.bytesFromBase58(self)
         guard 4 <= bytes.count else { return nil }
 
